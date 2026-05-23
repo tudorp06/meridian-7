@@ -579,8 +579,9 @@ body { display: flex; align-items: center; justify-content: center; }
   -webkit-box-orient: vertical;
   max-height: 2.5em;
 }
-.inv-item-stat { font-size: 14px; font-weight: 700; color: var(--ic); text-align: right; white-space: nowrap; line-height: 1.2; }
-.inv-item-eq   { font-size: 10px; color: var(--ic); text-align: right; margin-top: 6px; letter-spacing: 1px; line-height: 1; }
+.inv-item > div:last-child { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 6px; }
+.inv-item-stat { font-size: 14px; font-weight: 700; color: var(--ic); text-align: right; white-space: nowrap; }
+.inv-item-eq   { font-size: 10px; color: var(--ic); text-align: right; letter-spacing: 1px; }
 
 /* ── Pause screen ────────────────────────────────────────────── */
 #pause-screen {

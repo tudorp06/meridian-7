@@ -12,43 +12,15 @@ const LERP    = 0.28; // snappier visual catch-up for real-time movement
 
 // ── Sound System ──────────────────────────────────────────────────────────────
 const SFX = {
-  enabled: true,
-  play(freq, duration, type='sine', vol=0.15) {
-    if (!this.enabled) return;
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = type;
-      osc.frequency.value = freq;
-      gain.gain.value = vol;
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-    } catch(e) { /* audio not supported */ }
-  },
-  fabricate() { this.play(800, 0.08); setTimeout(() => this.play(1200, 0.12), 60); setTimeout(() => this.play(1600, 0.15), 140); },
-  pickup() { this.play(600, 0.08); setTimeout(() => this.play(900, 0.08), 50); },
-  hit() { this.play(150, 0.12, 'square', 0.2); },
-  shoot() { this.play(400, 0.05, 'square', 0.12); setTimeout(() => this.play(200, 0.08, 'square', 0.1), 30); },
-  swing() { this.play(250, 0.1, 'sawtooth', 0.15); },
-  death() { for(let i=0;i<5;i++) setTimeout(() => this.play(200-i*30, 0.15, 'square', 0.2), i*80); },
-  step() { this.play(100, 0.03, 'square', 0.05); },
-  alert() { this.play(1000, 0.1); setTimeout(() => this.play(1200, 0.1), 100); },
-  victory() {
-    // Ascending triumphant melody
-    const notes = [523, 659, 784, 1047, 1319, 1568]; // C5 E5 G5 C6 E6 G6
-    notes.forEach((freq, i) => {
-      setTimeout(() => this.play(freq, 0.25, 'sine', 0.12), i * 150);
-    });
-    // Final sustained chord
-    setTimeout(() => {
-      this.play(1047, 0.6, 'sine', 0.1);  // C6
-      this.play(1319, 0.6, 'sine', 0.08); // E6
-      this.play(1568, 0.6, 'sine', 0.06); // G6
-    }, 900);
-  },
+  fabricate() {},
+  pickup() {},
+  hit() {},
+  shoot() {},
+  swing() {},
+  death() {},
+  step() {},
+  alert() {},
+  victory() {},
 }
 
 const T = { WALL: 0, FLOOR: 1 };
@@ -276,25 +248,25 @@ function mkPlayer(x, y) {
 
 // Enemy templates with level weights — each level has a different mix
 const TEMPLATES = [
-  { name:'Patrol Drone',   sprite:'drone',    hp:22, damage:6,  defense:1, color:'#ff3355',
+  { name:'Patrol Drone',   sprite:'drone',    hp:35, damage:10, defense:2, color:'#ff3355',
     levelWeight: [5, 3, 1, 0, 0] },
-  { name:'Recon Drone',    sprite:'drone',    hp:18, damage:4,  defense:0, color:'#ff5577',
+  { name:'Recon Drone',    sprite:'drone',    hp:28, damage:8,  defense:1, color:'#ff5577',
     levelWeight: [4, 2, 0, 0, 0] },
-  { name:'Crawler',        sprite:'crawler',  hp:38, damage:9,  defense:2, color:'#ff7700',
+  { name:'Crawler',        sprite:'crawler',  hp:60, damage:15, defense:4, color:'#ff7700',
     levelWeight: [1, 4, 3, 2, 1] },
-  { name:'Venom Crawler',  sprite:'crawler',  hp:32, damage:12, defense:1, color:'#88cc00',
+  { name:'Venom Crawler',  sprite:'crawler',  hp:55, damage:20, defense:3, color:'#88cc00',
     levelWeight: [0, 2, 4, 3, 1] },
-  { name:'Sentinel',       sprite:'sentinel', hp:55, damage:13, defense:4, color:'#ff0088',
+  { name:'Sentinel',       sprite:'sentinel', hp:90, damage:22, defense:8, color:'#ff0088',
     levelWeight: [0, 1, 3, 4, 3] },
-  { name:'War Sentinel',   sprite:'sentinel', hp:70, damage:16, defense:6, color:'#dd0066',
+  { name:'War Sentinel',   sprite:'sentinel', hp:130,damage:28, defense:10,color:'#dd0066',
     levelWeight: [0, 0, 1, 3, 4] },
-  { name:'Xenomorph',      sprite:'alien',    hp:28, damage:8,  defense:1, color:'#9944ff',
+  { name:'Xenomorph',      sprite:'alien',    hp:50, damage:14, defense:3, color:'#9944ff',
     levelWeight: [1, 2, 3, 3, 2] },
-  { name:'Alpha Xenomorph',sprite:'alien',    hp:45, damage:14, defense:3, color:'#bb22ff',
+  { name:'Alpha Xenomorph',sprite:'alien',    hp:85, damage:24, defense:6, color:'#bb22ff',
     levelWeight: [0, 0, 1, 3, 5] },
-  { name:'Parasite',       sprite:'alien',    hp:16, damage:5,  defense:0, color:'#33cc55',
+  { name:'Parasite',       sprite:'alien',    hp:26, damage:9,  defense:0, color:'#33cc55',
     levelWeight: [3, 3, 2, 1, 0] },
-  { name:'Shock Drone',    sprite:'drone',    hp:30, damage:10, defense:2, color:'#44aaff',
+  { name:'Shock Drone',    sprite:'drone',    hp:55, damage:18, defense:4, color:'#44aaff',
     levelWeight: [0, 1, 2, 3, 2] },
 ];
 
@@ -310,8 +282,8 @@ function mkEnemy(x, y) {
     if (roll <= 0) { t = TEMPLATES[i]; break; }
   }
 
-  // Scale stats slightly with level
-  const scale = 1 + (currentLevel - 1) * 0.12;
+  // Scale stats with level — gets noticeably harder each floor
+  const scale = 1 + (currentLevel - 1) * 0.18;
   const hp = Math.round(t.hp * scale);
   const damage = Math.round(t.damage * scale);
   const defense = Math.round(t.defense * scale);
@@ -324,8 +296,8 @@ function mkEnemy(x, y) {
 
 function spawnEnemies() {
   // Scale enemy count with level
-  const baseEnemies = 1 + Math.floor(currentLevel / 2);
-  const maxEnemies = 2 + Math.floor(currentLevel / 2);
+  const baseEnemies = 2 + Math.floor(currentLevel / 2);
+  const maxEnemies = 3 + currentLevel;
 
   for (let i = 1; i < rooms.length; i++) {
     const r = rooms[i];
@@ -966,7 +938,6 @@ function closeFab() {
 }
 
 fabInput.addEventListener('keydown', async e => {
-  if (e.key==='Escape') { e.preventDefault(); closeFab(); return; }
   if (e.key!=='Enter') return;
   const desc = fabInput.value.trim();
   if (!desc) return;
@@ -1010,13 +981,14 @@ fabInput.addEventListener('keydown', async e => {
       return;
     }
 
-    fabStatus.style.color='#44ff88'; fabStatus.textContent='✓ FABRICATION COMPLETE — Press ESC to close';
+    fabStatus.style.color='#44ff88'; fabStatus.textContent='✓ FABRICATION COMPLETE — Press BACKSPACE to close';
     fabResName.textContent=`[ ${data.name.toUpperCase()} ]`; fabResName.style.color=data.color||'#00ffee';
     fabResDesc.textContent=data.description||'';
     fabResStats.textContent=`TYPE: ${(data.type||'').toUpperCase()}  ·  ATT: ${data.stats?.damage||0}  DEF: ${data.stats?.defense||0}  HP: ${data.stats?.hp||0}`;
     fabResult.classList.remove('hidden');
 
     // Spawn item immediately, but keep terminal open for user to review
+    data._userDesc = desc;
     spawnFabricated(data);
     log(`FABRICATED: ${data.name}`);
 
@@ -1106,40 +1078,35 @@ function drawFabAlert() {
 
 function detectSprite(name) {
   const n = (name||'').toLowerCase();
-
-  // Only match if the name CLEARLY indicates one of our 4 sprite types
-  // For anything else (dog, dragon, cat, etc.), return null to use emoji
+  if (!n) return null;
 
   // Drone-like entities (flying mechanical)
-  if (n.match(/^(drone|uav|flyer|copter|helicopter)s?$/)) return 'drone';
-  if (n.match(/\b(drone|uav|aerial\s*drone|hover\s*drone)\b/)) return 'drone';
+  if (n.match(/drone|uav|flyer|copter|helicopter/)) return 'drone';
 
   // Crawler-like entities (ground insects/arachnids)
-  if (n.match(/^(crawler|spider|scorpion|crab)s?$/)) return 'crawler';
-  if (n.match(/\b(crawler|spider|arachnid|scorpion)\b/)) return 'crawler';
+  if (n.match(/crawler|spider|scorpion|crab|arachnid/)) return 'crawler';
 
-  // Sentinel-like entities (humanoid robots/mechs)
-  if (n.match(/^(sentinel|robot|android|mech|cyborg)s?$/)) return 'sentinel';
-  if (n.match(/\b(sentinel|android|humanoid|mech|cyborg)\b/)) return 'sentinel';
-  if (n.match(/\brobot(?!.*\bdog\b)(?!.*\bcat\b)/)) return 'sentinel'; // "robot" but not "robot dog"
+  // Sentinel-like entities (humanoid robots/mechs) — but NOT "robot dog/cat"
+  if (n.match(/sentinel|android|mech|cyborg/)) return 'sentinel';
+  if (n.match(/robot/) && !n.match(/dog|cat|pet|puppy|kitten/)) return 'sentinel';
 
   // Alien-like entities (xenomorphs, aliens)
-  if (n.match(/^(alien|xenomorph|xeno)s?$/)) return 'alien';
-  if (n.match(/\b(alien|xenomorph|xeno|extraterrestrial)\b/)) return 'alien';
+  if (n.match(/alien|xeno|xenomorph|extraterrestrial/)) return 'alien';
 
-  // Everything else (dog, cat, dragon, vehicle, etc.) returns null → use emoji
   return null;
 }
 
 function spawnFabricated(data) {
   const pos = nearbyFloor(player.x, player.y, 4);
   if (!pos) return;
-  const sprite = detectSprite(data.name);
+  const userDesc = data._userDesc || '';
+  const sprite = detectSprite(data.name) || detectSprite(userDesc);
   const base = { id:uid(), x:pos.x, y:pos.y, rx:pos.x*TILE, ry:pos.y*TILE,
                  name:data.name, color:data.color||C.ally, sprite,
                  description:data.description||'', emoji:data.emoji||'?',
                  stats:data.stats||{damage:0,defense:0,hp:0,speed:0},
-                 specialEffect:data.specialEffect||'none', fabricated:true };
+                 specialEffect:data.specialEffect||'none', fabricated:true,
+                 userDesc };
   const {type} = data;
 
   // Detect epic weapons for special effects
@@ -1717,28 +1684,16 @@ function drawItem(cx, cy, e) {
   const name = (e.name || '').toLowerCase();
   const isEpic = name.match(/planet|orbital|destroyer|annihilator|obliterator|apocalypse|armageddon|god|titan|colossal|legendary|ultimate|supreme|divine|cosmic|galaxy|universe|extinction|cataclysm/);
 
-  const size = isEpic ? 32 : 22; // Epic weapons are BIGGER
+  const size = isEpic ? 28 : 22;
   const halfSize = size / 2;
-  const glowSize = isEpic ? 12 : 5;
 
-  // Epic weapons get pulsing animation
-  const epicPulse = isEpic ? Math.sin(gt * 0.1) * 0.3 + 1 : 1;
-
-  ctx.save();
-  if (isEpic) {
-    ctx.scale(epicPulse, epicPulse);
-    cx = cx / epicPulse;
-    cy = cy / epicPulse;
-  }
-
-  glow(col, glowSize);
   ctx.strokeStyle = col;
-  ctx.lineWidth = isEpic ? 3 : 1.5;
+  ctx.lineWidth = isEpic ? 2.5 : 1.5;
   ctx.strokeRect(cx - halfSize + 1, cy - halfSize + 1, size - 2, size - 2);
 
   // Corner accents (larger for epic)
-  ctx.lineWidth = isEpic ? 3 : 2;
-  const accentSize = isEpic ? 8 : 4;
+  ctx.lineWidth = isEpic ? 2.5 : 2;
+  const accentSize = isEpic ? 7 : 4;
   for (const [sx, sy] of [[-1,-1],[1,-1],[1,1],[-1,1]]) {
     ctx.beginPath();
     ctx.moveTo(cx + sx*halfSize, cy + sy*halfSize);
@@ -1748,12 +1703,9 @@ function drawItem(cx, cy, e) {
     ctx.stroke();
   }
 
-  ctx.shadowBlur = 0;
   ctx.fillStyle = col;
   ctx.strokeStyle = col;
   ctx.lineWidth = 1.5;
-
-  ctx.restore();
 
   const iconImg = ITEM_ICONS[getIconKey(e)];
   if (iconImg) {
@@ -2499,13 +2451,10 @@ function drawMinimap() {
 document.addEventListener('keydown', e => {
   if (introScreen && !introScreen.classList.contains('hidden')) return;
 
-  // Don't prevent default or capture keys when fabricating (let input work normally)
+  // Close fabrication with Backspace (only when input is disabled after result)
   if (state === 'fabricating') {
-    if (e.code === 'Escape') {
-      e.preventDefault(); // Prevent fullscreen exit
-      closeFab();
-    }
-    return; // Let all other keys work normally in the input field
+    if (e.code === 'Backspace' && fabInput.disabled) { e.preventDefault(); closeFab(); }
+    return;
   }
 
   // Normal game key handling
@@ -2995,7 +2944,7 @@ function getIconKey(e) {
     return 'consumable';
   }
   if (e.itemType === 'weapon') {
-    const n = (e.name||'').toLowerCase();
+    const n = ((e.name||'') + ' ' + (e.userDesc||'')).toLowerCase();
 
     // Epic/legendary/cosmic weapons → return null so emoji renders instead of generic gun
     if (n.match(/planet|orbital|destroyer|annihilator|obliterator|apocalypse|armageddon|god|titan|colossal|legendary|ultimate|supreme|divine|cosmic|galaxy|universe|extinction|cataclysm|omega|infinity|void|nova|singularity|quantum|antimatter|dark.?matter|black.?hole|supernova|nebula|pulsar|quasar/)) {
@@ -3011,15 +2960,15 @@ function getIconKey(e) {
     // Ranged weapons
     if (n.match(/minigun|gatling|vulcan/)) return 'weapon_minigun';
     if (n.match(/revolver/))              return 'weapon_revolver';
-    if (n.match(/tec-?9|tec9|machine pistol/)) return 'weapon_tec9';
+    if (n.match(/tec-?9|tec9|machine pistol|tommy|thompson|submachine/)) return 'weapon_tec9';
     if (n.match(/crossbow|bow/))          return 'weapon_crossbow';
     if (n.match(/bazooka|rocket|launcher|grenade|rpg|missile/)) return 'weapon_bazooka';
     if (n.match(/flame|fire|torch|incinerator|flamethrower/)) return 'weapon_flamethrower';
-    if (n.match(/laser|plasma|beam|ray|photon|blaster|cannon|rifle/)) return 'weapon_laser';
-    if (n.match(/automatic|smg|uzi/)) return 'weapon_minigun';
+    if (n.match(/laser|plasma|beam|ray|photon|blaster|cannon/)) return 'weapon_laser';
+    if (n.match(/rifle|automatic|smg|uzi|assault|ak|m4|ar-?15/)) return 'weapon_minigun';
     if (n.match(/pistol|gun|glock|beretta|magnum|colt|handgun|sidearm|shotgun/)) return 'weapon_gun';
 
-    // Fallback to gun icon for all other weapons (don't use emoji for fabricated guns)
+    // Fallback to gun icon for all other weapons
     return 'weapon_gun';
   }
   return null;

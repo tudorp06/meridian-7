@@ -126,10 +126,14 @@ TYPE RULES — BE SPECIFIC, match the request:
 - trap → stationary hazard damaging enemies
 - hazard → ONLY use for explicitly dangerous/destructive requests like "nuclear bomb", "black hole", "antimatter explosion", "self-destruct". Do NOT make unusual or creative items into hazards! A "cellphone" is a tool, a "boat" is a vehicle, a "teleporter" is a tool with speedBoost
 
-CREATIVITY RULES — NAMES MUST BE UNIQUE AND SPECIFIC:
-- "ally xenomorph" → "Xenostriker" or "Xeno Alpha" (NOT "Xenomorph Drone" or "Allied Xenomorph")
-- "giant ally bot" → "Titan Guardian" or "Colossus MK-7" (NOT "Giant Bot" or "Colossal Bot")
-- "ally cat" → "Combat Feline" or "Hunter Cat" (describe unique attack style)
+NAMING RULES — KEEP THE ORIGINAL KEYWORD IN THE NAME:
+- CRITICAL: The name MUST contain the key noun from the request so the game can identify it
+- "tommy gun" → "Tommy Gun MK-7" or "Plasma Tommy" (MUST contain "tommy" or "gun")
+- "ally xenomorph" → "Xeno Stalker" or "Alpha Xenomorph" (MUST contain "xeno" or "alien")
+- "ally robot" → "Combat Robot X9" or "Robot Sentinel" (MUST contain "robot" or "mech")
+- "laser sword" → "Plasma Saber" or "Laser Katana" (MUST contain "sword", "blade", "saber", or "laser")
+- "ally cat" → "Combat Cat" or "Hunter Cat" (MUST contain "cat")
+- "giant ally bot" → "Titan Mech MK-7" or "Giant Robot" (MUST contain "robot", "mech", or "bot")
 - "dragon ally" → "Plasma Drake" or "Inferno Wyrm" (NOT "Dragon Ally")
 - "robot friend" → "Sentinel-9000" or "Guardian Core" (NOT "Friendly Robot")
 - "invisibility potion" → "Stealth Serum", set specialEffect: "invisibility"
