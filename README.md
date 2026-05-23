@@ -82,7 +82,7 @@ The game needs a **Google Gemini API key** to generate items.
 **Get a free key (60 seconds):**
 1. Go to [aistudio.google.com](https://aistudio.google.com)
 2. Sign in with Google → "Get API key"
-3. Copy the key (starts with `AIza...`)
+3. Copy the key 
 4. Paste it on the game's start screen
 
 Free tier gives ~20 fabrications per day. No credit card needed.
@@ -138,4 +138,4 @@ MIT
 
 ---
 
-**Made for the hackathon web game category** 🚀
+**Made for the A3 hackathon, web game category** 🚀
