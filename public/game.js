@@ -925,14 +925,14 @@ function closePause() {
   pauseScreen.classList.add('hidden');
 }
 
+let fabComplete = false;
 function openFab() {
-  state='fabricating'; fabOverlay.classList.remove('hidden');
+  state='fabricating'; fabComplete=false; fabOverlay.classList.remove('hidden');
   fabInput.value=''; fabStatus.textContent=''; fabResult.classList.add('hidden');
   fabInput.disabled=false; setTimeout(()=>fabInput.focus(),30);
 }
 function closeFab() {
-  state='playing'; fabOverlay.classList.add('hidden');
-  // Reset for next fabrication
+  state='playing'; fabComplete=false; fabOverlay.classList.add('hidden');
   fabInput.value=''; fabStatus.textContent=''; fabResult.classList.add('hidden');
   fabInput.disabled=false;
 }
@@ -981,7 +981,8 @@ fabInput.addEventListener('keydown', async e => {
       return;
     }
 
-    fabStatus.style.color='#44ff88'; fabStatus.textContent='✓ FABRICATION COMPLETE — Press BACKSPACE to close';
+    fabComplete=true;
+    fabStatus.style.color='#44ff88'; fabStatus.textContent='✓ FABRICATION COMPLETE — Press any key to close';
     fabResName.textContent=`[ ${data.name.toUpperCase()} ]`; fabResName.style.color=data.color||'#00ffee';
     fabResDesc.textContent=data.description||'';
     fabResStats.textContent=`TYPE: ${(data.type||'').toUpperCase()}  ·  ATT: ${data.stats?.damage||0}  DEF: ${data.stats?.defense||0}  HP: ${data.stats?.hp||0}`;
@@ -2451,9 +2452,8 @@ function drawMinimap() {
 document.addEventListener('keydown', e => {
   if (introScreen && !introScreen.classList.contains('hidden')) return;
 
-  // Close fabrication with Backspace (only when input is disabled after result)
   if (state === 'fabricating') {
-    if (e.code === 'Backspace' && fabInput.disabled) { e.preventDefault(); closeFab(); }
+    if (fabComplete) { e.preventDefault(); closeFab(); }
     return;
   }
 
@@ -2822,20 +2822,13 @@ const CARDS = [
 <p class="dim">The <span class="highlight">minimap</span> (top-right) shows <span style="color:#4dd9e8">you</span>, <span style="color:#cc3344">enemies</span>, and the <span style="color:#44ffcc">exit door</span>. The compass arrow below the minimap points toward the exit.</p>`,
   },
   {
-    title: 'API Key — Optional',
+    title: 'Ready?',
     tag:   'Setup',
-    html: `<p>The fabrication terminal works out of the box. If you want <span class="highlight">unlimited</span> fabrications, paste your own free key below.</p>
+    html: `<p>The fabrication terminal is powered by AI. Type anything you can imagine and the station will build it for you.</p>
 <br>
-<p class="dim">Get one in 60 seconds — no credit card needed:</p>
-<p class="accent">aistudio.google.com  &#8594;  Sign in  &#8594;  Get API key</p>
+<p class="dim">You get <span class="highlight">20 fabrications per hour</span> — choose wisely.</p>
 <br>
-<div id="key-input-wrap">
-  <span class="dim">Paste key (optional):</span>
-  <input id="api-key-input" type="password" placeholder="AIza..." autocomplete="off" spellcheck="false" />
-  <span id="key-status"></span>
-</div>
-<br>
-<p class="dim">Without a key: 20 fabrications per hour. With your own key: unlimited.</p>`,
+<p class="accent">Good luck, survivor.</p>`,
   },
 ];
 
@@ -2857,46 +2850,13 @@ function renderCard(i) {
   introNext.className   = last ? 'final' : '';
 }
 
-let playerApiKey = localStorage.getItem('gemini_key') || '';
+let playerApiKey = '';
 
 function advanceIntro() {
-  // On the API key card, save whatever is in the input
-  if (cardIndex === CARDS.length - 2) {
-    // about to leave the key card — save it
-    const inp = document.getElementById('api-key-input');
-    if (inp && inp.value.trim()) {
-      playerApiKey = inp.value.trim();
-      localStorage.setItem('gemini_key', playerApiKey);
-    }
-  }
-
   if (cardIndex < CARDS.length - 1) {
     cardIndex++;
     renderCard(cardIndex);
-
-    // After rendering the key card, populate and wire the input
-    if (cardIndex === CARDS.length - 1) {
-      const inp = document.getElementById('api-key-input');
-      const status = document.getElementById('key-status');
-      if (inp) {
-        inp.value = playerApiKey;
-        if (playerApiKey) status.textContent = '✓ saved';
-        inp.addEventListener('input', () => {
-          playerApiKey = inp.value.trim();
-          localStorage.setItem('gemini_key', playerApiKey);
-          status.textContent = playerApiKey ? '✓ saved' : '';
-        });
-        // Don't let SPACE/ENTER advance while typing in the key field
-        inp.addEventListener('keydown', e => e.stopPropagation());
-        setTimeout(() => inp.focus(), 80);
-      }
-    }
   } else {
-    if (!playerApiKey) {
-      const status = document.getElementById('key-status');
-      if (status) { status.style.color = '#cc6622'; status.textContent = 'required!'; }
-      return;
-    }
     introScreen.classList.add('hidden');
     initGame();
     requestAnimationFrame(loop);
