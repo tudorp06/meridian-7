@@ -7,12 +7,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const API_KEY = process.env.GEMINI_API_KEY;
+// Shared demo key ($10 budget) — players can also enter their own on the start screen
+const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCdGRuBOu4uUgvhjDddkWIZ147KN_Iz_XI';
 
-// ── Startup check ─────────────────────────────────────────────────────────────
-if (!API_KEY || API_KEY === 'paste_your_key_here') {
-  console.error('\n[!] GEMINI_API_KEY not set — edit the .env file in the project folder.\n');
-} else {
+if (API_KEY) {
   console.log(`[✓] API key loaded: ${API_KEY.slice(0, 8)}...`);
 }
 
