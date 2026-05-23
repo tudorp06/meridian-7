@@ -75,11 +75,11 @@ The AI respects numbers and adjectives — `200HP potion` gives ~200 HP, `weak p
 
 ---
 
-## For Judges
+## For A3 Judges
 
 The AI fabrication system is live and ready to use — no setup needed. The API key is pre-configured on the server.
 
-**Please keep usage reasonable — the API key is on a free tier, so I'd kindly ask you to stay under ~50 fabrication requests during your review.** That should be more than enough to experience the full game (most runs use 5-10 fabrications).
+**Please keep usage reasonable — the API credits are on my account (I have enough balance deposited for credits, but there's still a limit), so I'd kindly ask you to stay under ~50 fabrication requests during your review.** That should be more than enough to experience the full game (most runs use 5-10 fabrications).
 
 If fabrication ever fails or returns an error, it likely means the API rate limit was temporarily hit. Just wait a minute and try again.
 
@@ -87,7 +87,7 @@ Thank you for playing!
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Quick Start for Local Development
 
 ```bash
 npm install
