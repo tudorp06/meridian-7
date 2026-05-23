@@ -982,6 +982,7 @@ fabInput.addEventListener('keydown', async e => {
     }
 
     fabComplete=true;
+    fabInput.blur();
     fabStatus.style.color='#44ff88'; fabStatus.textContent='✓ FABRICATION COMPLETE — Press any key to close';
     fabResName.textContent=`[ ${data.name.toUpperCase()} ]`; fabResName.style.color=data.color||'#00ffee';
     fabResDesc.textContent=data.description||'';
@@ -2967,14 +2968,16 @@ function onFullscreenChange() {
   } else {
     container.style.transform = '';
     btnFS.textContent = '⛶ FULLSCREEN';
-    // Browser stole ESC to exit fullscreen — close any open overlay
-    if (state === 'fabricating') closeFab();
-    if (state === 'inventory')   closeInventory();
   }
 }
 
 // Click canvas to dismiss fabrication alert
 canvas.addEventListener('click', () => { if (fabAlert) fabAlert = null; });
+
+// Click overlay background to close fabrication when complete
+fabOverlay.addEventListener('click', e => {
+  if (fabComplete && e.target === fabOverlay) closeFab();
+});
 
 btnFS.addEventListener('click', toggleFullscreen);
 document.addEventListener('keydown', e => { if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); } });
