@@ -81,9 +81,9 @@ TYPE RULES — BE SPECIFIC, match the request:
 - ally → autonomous combat unit - BE CREATIVE! "ally xenomorph" = actual xenomorph, NOT generic drone
 - pet → non-combat companion (cats, dogs, creatures) - USE THE EXACT ANIMAL REQUESTED
 - vehicle → mount/vehicle (speed boost)
-- tool → utility item with special effects
+- tool → utility item with special effects. USE THIS for unusual/creative/non-combat requests (cellphone, boat, teleporter, laptop, umbrella, chair, etc.) — give them fun sci-fi flavor and minor stat boosts
 - trap → stationary hazard damaging enemies
-- hazard → malfunction, spawns hostile
+- hazard → ONLY use for explicitly dangerous/destructive requests like "nuclear bomb", "black hole", "antimatter explosion", "self-destruct". Do NOT make unusual or creative items into hazards! A "cellphone" is a tool, a "boat" is a vehicle, a "teleporter" is a tool with speedBoost
 
 CREATIVITY RULES — NAMES MUST BE UNIQUE AND SPECIFIC:
 - "ally xenomorph" → "Xenostriker" or "Xeno Alpha" (NOT "Xenomorph Drone" or "Allied Xenomorph")
@@ -142,7 +142,7 @@ Output valid JSON only, nothing else`;
       .trim();
     const data = JSON.parse(raw);
     console.log(`[FABRICATED] ${data.type.toUpperCase()} — ${data.name}: ${data.description}`);
-    console.log(`             stats: ATK ${data.stats?.damage||0} DEF ${data.stats?.defense||0} HP ${data.stats?.hp||0}`);
+    console.log(`             stats: ATT ${data.stats?.damage||0} DEF ${data.stats?.defense||0} HP ${data.stats?.hp||0}`);
     res.json(data);
   } catch (err) {
     console.error('Fabrication error:', err.message);

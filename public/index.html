@@ -80,9 +80,25 @@
 
     <!-- ── Win screen ────────────────────────────────────────── -->
     <div id="win-screen" class="hidden">
-      <div id="win-title">SIGNAL RESTORED</div>
-      <div id="win-sub">You escaped Meridian-7. Against all odds.</div>
-      <div id="win-restart">Press R to play again</div>
+      <div id="win-stage1" class="win-stage">
+        <div id="win-reactor">⚠ REACTOR CRITICAL ⚠</div>
+        <div id="win-escape-text">ESCAPE POD LAUNCHED</div>
+      </div>
+      <div id="win-stage2" class="win-stage">
+        <div id="win-ship">🚀</div>
+      </div>
+      <div id="win-stage3" class="win-stage">
+        <div id="win-title">MERIDIAN-7</div>
+        <div id="win-subtitle">MISSION COMPLETE</div>
+        <div id="win-narrative">
+          <p>The escape pod breaks free from the station's gravitational pull.</p>
+          <p>Behind you, Meridian-7 collapses into itself — the rogue AI consumed by the reactor meltdown.</p>
+          <p>You survived. Armed with nothing but an experimental fabrication terminal and your own creativity.</p>
+          <p class="win-highlight">The signal is broadcasting. Rescue is on its way.</p>
+        </div>
+        <div id="win-stats-display"></div>
+        <div id="win-restart">Press R to play again</div>
+      </div>
     </div>
 
     <!-- ── Level transition ───────────────────────────────────── -->

@@ -26,7 +26,58 @@ body { display: flex; align-items: center; justify-content: center; }
   height: min(100vh, calc(100vw * 9 / 16));
   flex-shrink: 0;
 }
-#gameCanvas { display: block; width: 100%; height: 100%; border: none; }
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ── Sci-Fi Screen Effects ────────────────────────────────────── */
+#game-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 30, 48, 0.03) 50%,
+    rgba(0, 0, 0, 0.03) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 100;
+  animation: scanlines 8s linear infinite;
+  opacity: 0.4;
+}
+
+@keyframes scanlines {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(4px); }
+}
+
+/* Corner accents */
+#game-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(77, 217, 232, 0.15);
+  border-image: linear-gradient(135deg,
+    rgba(77, 217, 232, 0.4) 0%,
+    transparent 20%,
+    transparent 80%,
+    rgba(77, 217, 232, 0.4) 100%
+  ) 1;
+  pointer-events: none;
+  z-index: 101;
+  animation: borderPulse 3s ease-in-out infinite;
+}
+
+@keyframes borderPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
 
 /* ── Intro cards ─────────────────────────────────────────────── */
 #intro-screen {
@@ -131,9 +182,42 @@ body { display: flex; align-items: center; justify-content: center; }
 #fab-panel {
   width: 900px;
   padding: 52px 60px 44px;
-  background: rgba(5,10,20,0.99);
-  border: 1px solid #2a5070;
-  box-shadow: 0 0 50px rgba(40,110,170,.22);
+  background: linear-gradient(135deg, rgba(5,10,20,0.98), rgba(10,15,30,0.98));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+  box-shadow:
+    0 0 60px rgba(77,217,232,.25),
+    inset 0 1px 0 rgba(77,217,232,0.1),
+    inset 0 -1px 0 rgba(77,217,232,0.05);
+  animation: panelGlow 4s ease-in-out infinite;
+}
+
+#fab-panel::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg,
+    #4dd9e8 0%,
+    #2a7090 25%,
+    #4dd9e8 50%,
+    #2a7090 75%,
+    #4dd9e8 100%);
+  background-size: 200% 200%;
+  border-radius: inherit;
+  z-index: -1;
+  animation: borderShift 6s linear infinite;
+}
+
+@keyframes panelGlow {
+  0%, 100% { box-shadow: 0 0 60px rgba(77,217,232,.25), inset 0 1px 0 rgba(77,217,232,0.1); }
+  50% { box-shadow: 0 0 80px rgba(77,217,232,.35), inset 0 1px 0 rgba(77,217,232,0.2); }
+}
+
+@keyframes borderShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 #fab-title {
@@ -141,7 +225,18 @@ body { display: flex; align-items: center; justify-content: center; }
   font-size: 30px; font-weight: 700; letter-spacing: 5px;
   color: #5bc4d0; text-transform: uppercase;
   margin: 0 0 14px 0; line-height: 1.2;
-  text-shadow: 0 0 12px rgba(91,196,208,0.35);
+  text-shadow:
+    0 0 12px rgba(91,196,208,0.6),
+    0 0 25px rgba(91,196,208,0.3),
+    2px 0 2px rgba(255,0,128,0.3),
+    -2px 0 2px rgba(0,255,255,0.3);
+  animation: titlePulse 2s ease-in-out infinite;
+  position: relative;
+}
+
+@keyframes titlePulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 12px rgba(91,196,208,0.6), 2px 0 2px rgba(255,0,128,0.3); }
+  50% { opacity: 0.95; text-shadow: 0 0 20px rgba(91,196,208,0.8), 3px 0 3px rgba(255,0,128,0.4); }
 }
 #fab-sub {
   font-family: 'Courier New', Courier, monospace;
@@ -151,14 +246,55 @@ body { display: flex; align-items: center; justify-content: center; }
 }
 #fab-input-row {
   display: flex; align-items: center; gap: 12px;
-  border-bottom: 1px solid #1a3048;
+  border-bottom: 2px solid #1a3048;
   padding-bottom: 16px; margin-bottom: 16px;
+  transition: all 0.3s ease;
+  position: relative;
 }
-#fab-caret { color: #5bc4d0; font-size: 22px; font-family: 'Courier New', monospace; flex-shrink: 0; }
+
+#fab-input-row::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #4dd9e8, transparent);
+  transition: width 0.4s ease;
+}
+
+#fab-input-row:focus-within::after {
+  width: 100%;
+}
+
+#fab-caret {
+  color: #5bc4d0;
+  font-size: 22px;
+  font-family: 'Courier New', monospace;
+  flex-shrink: 0;
+  animation: caretBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes caretBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.3; }
+}
+
 #fab-input {
-  flex: 1; background: transparent; border: none; outline: none;
-  color: #d0e8f8; font-family: 'Courier New', monospace;
-  font-size: 22px; caret-color: #5bc4d0;
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #d0e8f8;
+  font-family: 'Courier New', monospace;
+  font-size: 22px;
+  caret-color: #5bc4d0;
+  text-shadow: 0 0 8px rgba(77,217,232,0.2);
+  transition: text-shadow 0.3s ease;
+}
+
+#fab-input:focus {
+  text-shadow: 0 0 12px rgba(77,217,232,0.4);
 }
 #fab-status { font-size: 16px; min-height: 22px; color: #cc9933; margin-bottom: 8px; }
 
@@ -246,30 +382,144 @@ body { display: flex; align-items: center; justify-content: center; }
 /* ── Win screen ──────────────────────────────────────────────── */
 #win-screen {
   position: absolute; inset: 0;
-  background: rgba(0,10,20,0.88);
+  background: #000;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   z-index: 30;
+  overflow: hidden;
 }
 #win-screen.hidden { display: none; }
 
-#win-title {
-  display: block;
-  font-size: 60px; font-weight: 800; letter-spacing: 2px; line-height: 1;
-  color: #33ddaa;
-  text-shadow: 0 0 20px rgba(30,180,120,0.4);
-  margin-bottom: 56px;   /* same rule as dead screen */
+.win-stage {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  pointer-events: none;
 }
-#win-sub {
-  display: block;
-  font-size: 20px; font-weight: 400;
-  color: #77ccaa;
-  margin-bottom: 52px;
+.win-stage.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Stage 1: Reactor critical */
+#win-reactor {
+  font-size: 28px; font-weight: 800; letter-spacing: 6px;
+  color: #ff3333;
+  text-shadow: 0 0 30px rgba(255,50,50,0.8), 0 0 60px rgba(255,0,0,0.4);
+  animation: reactorPulse 0.4s ease-in-out infinite alternate;
+}
+@keyframes reactorPulse {
+  0% { opacity: 0.6; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1.02); }
+}
+#win-escape-text {
+  font-size: 48px; font-weight: 800; letter-spacing: 8px;
+  color: #33ddaa;
+  text-shadow: 0 0 40px rgba(30,220,170,0.6);
+  margin-top: 40px;
+  opacity: 0;
+  animation: escapeSlide 1s ease-out 1.5s forwards;
+}
+@keyframes escapeSlide {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Stage 2: Ship flying through stars */
+#win-stage2 {
+  background: radial-gradient(ellipse at center, #060818 0%, #000 70%);
+}
+#win-stage2::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(1px 1px at 10% 20%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 30% 60%, #aaccff 50%, transparent 100%),
+    radial-gradient(1px 1px at 50% 10%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 70% 80%, #88aadd 50%, transparent 100%),
+    radial-gradient(1px 1px at 90% 40%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 15% 85%, #aaddff 50%, transparent 100%),
+    radial-gradient(1px 1px at 45% 45%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 80% 15%, #ccddff 50%, transparent 100%),
+    radial-gradient(1px 1px at 60% 70%, #fff 50%, transparent 100%),
+    radial-gradient(1px 1px at 25% 35%, #88bbee 50%, transparent 100%);
+  animation: starDrift 4s linear infinite;
+}
+@keyframes starDrift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-20px); }
+}
+#win-ship {
+  font-size: 80px;
+  filter: drop-shadow(0 0 30px rgba(77,217,232,0.6));
+  animation: shipFly 3s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes shipFly {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-15px) rotate(-5deg); }
+}
+
+/* Stage 3: Final summary */
+#win-stage3 {
+  background: radial-gradient(ellipse at center, #061520 0%, #000 80%);
+}
+#win-title {
+  font-size: 64px; font-weight: 800; letter-spacing: 12px;
+  color: #33ddaa;
+  text-shadow: 0 0 40px rgba(30,220,170,0.5), 0 0 80px rgba(30,180,120,0.2);
+  margin-bottom: 8px;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+@keyframes titleGlow {
+  0% { text-shadow: 0 0 40px rgba(30,220,170,0.5); }
+  100% { text-shadow: 0 0 60px rgba(30,220,170,0.8), 0 0 120px rgba(30,180,120,0.3); }
+}
+#win-subtitle {
+  font-size: 20px; font-weight: 600; letter-spacing: 8px;
+  color: #4dd9e8;
+  text-shadow: 0 0 20px rgba(77,217,232,0.4);
+  margin-top: 4px;
+  margin-bottom: 48px;
+  position: relative;
+  z-index: 2;
+}
+#win-narrative {
+  max-width: 600px; text-align: center;
+  margin-bottom: 40px;
+}
+#win-narrative p {
+  font-size: 16px; line-height: 1.8;
+  color: #7a9ab0;
+  margin: 0 0 12px 0;
+  opacity: 0;
+  animation: narrativeFade 0.8s ease-out forwards;
+}
+#win-narrative p:nth-child(1) { animation-delay: 0.3s; }
+#win-narrative p:nth-child(2) { animation-delay: 1.2s; }
+#win-narrative p:nth-child(3) { animation-delay: 2.1s; }
+#win-narrative p:nth-child(4) { animation-delay: 3.0s; }
+@keyframes narrativeFade {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.win-highlight {
+  color: #33ddaa !important;
+  font-weight: 600;
+  text-shadow: 0 0 15px rgba(30,220,170,0.3);
+}
+#win-stats-display {
+  font-size: 14px; letter-spacing: 2px;
+  color: #4a7a8a;
+  margin-bottom: 36px;
 }
 #win-restart {
   font-family: 'Courier New', monospace;
   font-size: 15px; letter-spacing: 2px;
   color: #7a9ab0;
   border: 1px solid #2a5544; padding: 13px 40px;
+  opacity: 0;
+  animation: narrativeFade 0.8s ease-out 4s forwards;
 }
 
 /* ── Inventory ───────────────────────────────────────────────── */
@@ -329,8 +579,8 @@ body { display: flex; align-items: center; justify-content: center; }
   -webkit-box-orient: vertical;
   max-height: 2.5em;
 }
-.inv-item-stat { font-size: 14px; font-weight: 700; color: var(--ic); text-align: right; white-space: nowrap; }
-.inv-item-eq   { font-size: 11px; color: var(--ic); text-align: right; margin-top: 4px; letter-spacing: 1px; }
+.inv-item-stat { font-size: 14px; font-weight: 700; color: var(--ic); text-align: right; white-space: nowrap; line-height: 1.2; }
+.inv-item-eq   { font-size: 10px; color: var(--ic); text-align: right; margin-top: 6px; letter-spacing: 1px; line-height: 1; }
 
 /* ── Pause screen ────────────────────────────────────────────── */
 #pause-screen {
