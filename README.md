@@ -55,7 +55,7 @@ The AI respects numbers and adjectives — `200HP potion` gives ~200 HP, `weak p
 - **Allies & pets** — fabricated companions follow you and persist between levels
 - **5 levels** with progressive alien corruption (clean station → infested reactor)
 - **Boss encounters** near level exits with threat indicators
-- **Procedural sound effects** via Web Audio API
+- **Increasing difficulty** — enemies get tougher each floor
 - **Organic map generation** — circular rooms, irregular blobs, corridors
 - **Particle effects** — fabrication, hits, projectile trails
 - **Minimap, tooltips, damage numbers, screen shake**
@@ -75,27 +75,19 @@ The AI respects numbers and adjectives — `200HP potion` gives ~200 HP, `weak p
 
 ---
 
-## 🔑 API Setup
+## For Judges
 
-The game needs a **Google Gemini API key** to generate items.
+The AI fabrication system is live and ready to use — no setup needed. The API key is pre-configured on the server.
 
-**Get a free key (60 seconds):**
-1. Go to [aistudio.google.com](https://aistudio.google.com)
-2. Sign in with Google → "Get API key"
-3. Copy the key 
-4. Paste it on the game's start screen
+**Please keep usage reasonable — the API key is on a free tier, so I'd kindly ask you to stay under ~50 fabrication requests during your review.** That should be more than enough to experience the full game (most runs use 5-10 fabrications).
 
-Free tier gives ~20 fabrications per day. No credit card needed.
+If fabrication ever fails or returns an error, it likely means the API rate limit was temporarily hit. Just wait a minute and try again.
 
-### AI Transparency
-
-- **What's sent:** Only your item descriptions (e.g. "minigun", "healing cat")
-- **No personal data** is collected or stored
-- **Cost:** ~$0.0001 per fabrication on paid tier
+Thank you for playing!
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Local Development)
 
 ```bash
 npm install
@@ -125,8 +117,7 @@ Open **http://localhost:3000**
 ## 🎨 Technical Stack
 
 - **Canvas rendering** — custom sprite system, particle effects, lerped camera
-- **Node.js / Express** — proxies Gemini API requests
-- **Web Audio API** — procedural sound synthesis
+- **Node.js / Express** — proxies Gemini API requests on Render
 - **BSP-inspired dungeon gen** — organic room shapes, blob rooms
 - **Real-time game loop** — independent player/enemy timers
 
