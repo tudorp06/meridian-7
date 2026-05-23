@@ -7,11 +7,35 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCdGRuBOu4uUgvhjDddkWIZ147KN_Iz_XI';
+const API_KEY = process.env.GEMINI_API_KEY;
 
 if (API_KEY) {
   console.log(`[✓] API key loaded: ${API_KEY.slice(0, 8)}...`);
 }
+
+// ── Rate limiter — protect the shared API key ─────────────────────────────────
+const rateLimits = new Map(); // IP → { count, resetTime }
+const RATE_LIMIT  = 20;       // max fabrications per window
+const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  let entry = rateLimits.get(ip);
+  if (!entry || now > entry.resetTime) {
+    entry = { count: 0, resetTime: now + RATE_WINDOW };
+    rateLimits.set(ip, entry);
+  }
+  entry.count++;
+  return { allowed: entry.count <= RATE_LIMIT, remaining: Math.max(0, RATE_LIMIT - entry.count) };
+}
+
+// Cleanup stale entries every 10 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimits) {
+    if (now > entry.resetTime) rateLimits.delete(ip);
+  }
+}, 10 * 60 * 1000);
 
 // ── /test — visit in browser to confirm key + see available models ─────────────
 app.get('/test', async (req, res) => {
@@ -50,6 +74,17 @@ app.post('/fabricate', async (req, res) => {
   // Use the key the player provided; fall back to server .env key
   const keyToUse = (apiKey && apiKey.startsWith('AIza')) ? apiKey : API_KEY;
   if (!keyToUse) return res.status(401).json({ error: 'No API key — enter one on the start screen' });
+
+  // Rate limit when using the shared server key (not player's own key)
+  const usingSharedKey = !apiKey || !apiKey.startsWith('AIza');
+  if (usingSharedKey) {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const { allowed, remaining } = checkRateLimit(ip);
+    if (!allowed) {
+      return res.status(429).json({ error: `Rate limit reached (${RATE_LIMIT}/hour). Enter your own free API key to get unlimited fabrications!` });
+    }
+    console.log(`[RATE] ${ip}: ${remaining} fabrications remaining this hour`);
+  }
 
   const prompt = `You are the fabrication AI aboard a derelict space station in 2387. A survivor requested to fabricate: "${description.trim()}"
 
