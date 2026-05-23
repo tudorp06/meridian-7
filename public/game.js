@@ -739,21 +739,43 @@ function runEnemyTurns() {
     }
   });
 
-  // Traps — damage nearby enemies
+  // Traps — trigger when enemy steps on or adjacent to them
   entities.filter(e=>e.type==='trap').forEach(trap => {
-    trap.trapTimer = (trap.trapTimer || 0) + 1;
-    if (trap.trapTimer % 20 === 0) { // check every 20 ticks
-      const range = trap.triggerRange || 2;
-      entities.filter(e => (e.type==='enemy'||e.type==='hazard') && mdist(trap, e) <= range).forEach(enemy => {
+    const range = trap.triggerRange || 2;
+    const nearbyEnemies = entities.filter(e =>
+      (e.type==='enemy'||e.type==='hazard') && mdist(trap, e) <= range
+    );
+
+    if (nearbyEnemies.length > 0) {
+      // Cooldown: don't fire every single tick
+      trap.trapCooldown = (trap.trapCooldown || 0) - 1;
+      if (trap.trapCooldown <= 0) {
+        trap.trapCooldown = 5; // Fire every 5 enemy ticks (~1.8s)
         const dmg = trap.damage || 10;
-        enemy.hp -= dmg;
-        hitParticles(enemy.rx, enemy.ry, trap.color||'#ff8844');
-        spawnDmgNum(enemy.rx, enemy.ry, dmg, trap.color||'#ff8844');
-        if (enemy.hp <= 0) {
-          log(`${enemy.name||'Enemy'} destroyed by ${trap.name}`);
-          entities = entities.filter(e => e !== enemy);
+
+        nearbyEnemies.forEach(enemy => {
+          enemy.hp -= dmg;
+          hitParticles(enemy.rx, enemy.ry, trap.color||'#ff8844');
+          spawnDmgNum(enemy.rx, enemy.ry, dmg, trap.color||'#ff8844');
+          SFX.hit();
+
+          if (enemy.hp <= 0) {
+            log(`${trap.name} destroyed ${enemy.name||'Enemy'}`);
+            entities = entities.filter(e => e !== enemy);
+          }
+        });
+
+        // Trigger flash effect on the trap
+        trap.triggerFlash = 8;
+
+        // Consume uses — traps have limited charges
+        trap.charges = trap.charges ?? 8;
+        trap.charges--;
+        if (trap.charges <= 0) {
+          log(`${trap.name} depleted`);
+          entities = entities.filter(e => e !== trap);
         }
-      });
+      }
     }
   });
 }
@@ -1641,17 +1663,30 @@ function drawPet(cx, cy, e) {
 function drawTrap(cx, cy, e) {
   const col = e.color || '#ff8844';
   const pulse = Math.sin(gt * 0.1) * 0.3 + 0.7;
+  const triggered = (e.triggerFlash || 0) > 0;
+
+  // Trigger flash — bright burst when trap fires
+  if (triggered) {
+    e.triggerFlash--;
+    ctx.fillStyle = col;
+    ctx.globalAlpha = e.triggerFlash / 8 * 0.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 20 + (8 - e.triggerFlash) * 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
   // Draw emoji if available
   if (e.emoji && e.emoji !== '?') {
-    ctx.shadowBlur = 8 * pulse; ctx.shadowColor = col;
+    ctx.shadowBlur = triggered ? 16 : 8 * pulse;
+    ctx.shadowColor = triggered ? '#ffffff' : col;
     ctx.font = 'bold 28px Arial';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(e.emoji, cx, cy);
     ctx.textBaseline = 'alphabetic';
   } else {
-    glow(col, 8 * pulse);
+    glow(col, triggered ? 16 : 8 * pulse);
     ctx.fillStyle = col; ctx.strokeStyle = col;
-    // Danger symbol - triangle with exclamation
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(cx, cy-12); ctx.lineTo(cx+11, cy+8); ctx.lineTo(cx-11, cy+8);
@@ -1660,6 +1695,7 @@ function drawTrap(cx, cy, e) {
     ctx.textAlign = 'center';
     ctx.fillText('!', cx, cy+4);
   }
+
   // Range indicator (pulsing circle)
   ctx.shadowBlur = 0; ctx.strokeStyle = col + '44';
   ctx.lineWidth = 1;
@@ -1667,6 +1703,12 @@ function drawTrap(cx, cy, e) {
   const range = (e.triggerRange || 2) * TILE;
   ctx.arc(cx, cy, range * pulse, 0, Math.PI*2);
   ctx.stroke();
+
+  // Charges remaining
+  const charges = e.charges ?? 8;
+  ctx.fillStyle = charges <= 2 ? '#ff3333' : '#88aacc';
+  ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+  ctx.fillText(`${charges}`, cx, cy + 18);
 }
 
 function drawItem(cx, cy, e) {

@@ -7,7 +7,6 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Shared demo key ($10 budget) — players can also enter their own on the start screen
 const API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyCdGRuBOu4uUgvhjDddkWIZ147KN_Iz_XI';
 
 if (API_KEY) {
