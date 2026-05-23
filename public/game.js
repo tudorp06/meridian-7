@@ -483,7 +483,6 @@ function drawDmgNums() {
     ctx.save();
     ctx.globalAlpha = Math.min(1, d.life * 1.5);
     ctx.fillStyle = d.color;
-    ctx.shadowBlur = 6; ctx.shadowColor = d.color;
     ctx.font = `bold 13px monospace`;
     ctx.textAlign = 'center';
     ctx.fillText(d.text, d.x, d.y);
@@ -977,23 +976,25 @@ fabInput.addEventListener('keydown', async e => {
   const loader = setInterval(()=>{ dots=(dots+1)%4; fabStatus.textContent='Fabricating'+'.'.repeat(dots); },350);
 
   try {
-    const res = await fetch('/fabricate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc, apiKey:playerApiKey})});
+    const res = await fetch('https://meridian-7-backend.onrender.com/fabricate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:desc, apiKey:playerApiKey})});
     clearInterval(loader);
 
     if (!res.ok) {
-      // Handle specific error types
+      let errMsg = '';
+      try { const errData = await res.json(); errMsg = errData.error || ''; } catch(e) {}
+
       if (res.status === 429) {
         fabStatus.style.color='#ffaa00';
-        fabStatus.textContent='⚠ AI BUSY — Too many requests. Wait 30 seconds and try again.';
-      } else if (res.status === 403 || res.status === 401) {
+        fabStatus.textContent=errMsg ? `⚠ ${errMsg}` : '⚠ RATE LIMITED — Wait a moment and try again.';
+      } else if (res.status === 401) {
         fabStatus.style.color='#ff2244';
-        fabStatus.textContent='✗ API LIMIT EXCEEDED — Daily quota reached. Add credits or try tomorrow.';
-      } else if (res.status === 404) {
+        fabStatus.textContent=errMsg ? `✗ ${errMsg}` : '✗ NO API KEY — Set GEMINI_API_KEY in server environment.';
+      } else if (res.status === 500) {
         fabStatus.style.color='#ff2244';
-        fabStatus.textContent='✗ CONNECTION FAILED — AI service unavailable. Check your API key.';
+        fabStatus.textContent=errMsg ? `✗ ${errMsg}` : '✗ FABRICATION OFFLINE — Server error. Check server logs.';
       } else {
         fabStatus.style.color='#ff2244';
-        fabStatus.textContent=`✗ FABRICATION FAILURE — Error ${res.status}. Terminal unstable.`;
+        fabStatus.textContent=errMsg ? `✗ ${errMsg}` : `✗ ERROR ${res.status} — Terminal malfunction.`;
       }
       fabInput.disabled=false;
       return;
@@ -1556,13 +1557,12 @@ function drawEnemy(cx, cy, e) {
 
   // For fabricated hazards: use sprite ONLY if detectSprite returned a valid match
   if (e.fabricated && (!e.sprite || e.sprite === null) && e.emoji && e.emoji !== '?') {
-    // No known sprite → use emoji
-    ctx.shadowBlur = 8; ctx.shadowColor = col;
+    // No known sprite → use emoji (no shadow for performance)
     ctx.font = 'bold 36px Arial';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = col;
     ctx.fillText(e.emoji, cx, cy);
     ctx.textBaseline = 'alphabetic';
-    ctx.shadowBlur = 0;
     // Warning indicator for hazards
     if (e.type === 'hazard') {
       ctx.fillStyle = '#cc6622';
@@ -1601,13 +1601,12 @@ function drawAlly(cx, cy, e) {
   // For fabricated allies: use sprite ONLY if detectSprite returned a valid match
   // Otherwise use emoji (dog, dragon, cat, vehicle, etc.)
   if (e.fabricated && (!e.sprite || e.sprite === null) && e.emoji && e.emoji !== '?') {
-    // No known sprite → use emoji
-    ctx.shadowBlur = 8; ctx.shadowColor = col;
+    // No known sprite → use emoji (no shadow for performance)
     ctx.font = 'bold 36px Arial';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = col;
     ctx.fillText(e.emoji, cx, cy);
     ctx.textBaseline = 'alphabetic';
-    ctx.shadowBlur = 0;
   } else if (e.sprite && e.sprite !== null) {
     // Has a known sprite → use it
     glow(col, 6);
@@ -2038,7 +2037,7 @@ function drawParticles() {
   for (const p of particles) {
     ctx.save();
     ctx.globalAlpha=Math.max(0,p.life);
-    ctx.fillStyle=p.color; ctx.shadowBlur=8; ctx.shadowColor=p.color;
+    ctx.fillStyle=p.color;
     ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
     ctx.restore();
   }
@@ -2065,9 +2064,8 @@ function drawHUD() {
   ctx.fillText('HP', hpLabelX, hpBarY + 19);
 
   ctx.fillStyle = '#0d1a28'; ctx.fillRect(hpBarX, hpBarY, hpBarW, hpBarH);
-  ctx.fillStyle = hpCol; ctx.shadowBlur = 4; ctx.shadowColor = hpCol;
+  ctx.fillStyle = hpCol;
   ctx.fillRect(hpBarX, hpBarY, hpBarW * hpPct, hpBarH);
-  ctx.shadowBlur = 0;
 
   // Segment ticks
   ctx.strokeStyle = 'rgba(6,9,15,0.45)'; ctx.lineWidth = 1;
@@ -2503,7 +2501,10 @@ document.addEventListener('keydown', e => {
 
   // Don't prevent default or capture keys when fabricating (let input work normally)
   if (state === 'fabricating') {
-    if (e.code === 'Escape') closeFab();
+    if (e.code === 'Escape') {
+      e.preventDefault(); // Prevent fullscreen exit
+      closeFab();
+    }
     return; // Let all other keys work normally in the input field
   }
 
@@ -2838,7 +2839,7 @@ const CARDS = [
     tag:   'Your last resort',
     html: `<p>The terminal uses <span class="highlight">neural-pattern synthesis</span> — an AI interprets your description and materializes equipment from available matter. Originally designed for deep-space emergencies.</p>
 <br>
-<p>Press <span class="key">F</span> — describe <strong>anything</strong> you need — press <span class="key">Enter</span>. The AI (Google Gemini) interprets your request and generates it in real-time.</p>
+<p>Press <span class="key">F</span> — describe <strong>anything</strong> you need — press <span class="key">Enter</span>. The AI terminal interprets your request and materializes it in real-time.</p>
 <div class="fab-grid">
   <div class="fab-icon" style="color:#cc7733;border-color:#cc7733">&#9876;</div>
   <div><span class="highlight">WEAPON</span> &nbsp;<span class="dim">— guns, swords, miniguns, lasers. Press SPACE to use.</span></div>
@@ -2872,20 +2873,20 @@ const CARDS = [
 <p class="dim">The <span class="highlight">minimap</span> (top-right) shows <span style="color:#4dd9e8">you</span>, <span style="color:#cc3344">enemies</span>, and the <span style="color:#44ffcc">exit door</span>. The compass arrow below the minimap points toward the exit.</p>`,
   },
   {
-    title: 'API Key — Required',
-    tag:   'AI setup',
-    html: `<p>Fabrication is powered by <span class="highlight">Google Gemini AI</span>. You need a free API key to use it.</p>
+    title: 'API Key — Optional',
+    tag:   'Setup',
+    html: `<p>The fabrication terminal works out of the box. If you want <span class="highlight">unlimited</span> fabrications, paste your own free key below.</p>
 <br>
 <p class="dim">Get one in 60 seconds — no credit card needed:</p>
 <p class="accent">aistudio.google.com  &#8594;  Sign in  &#8594;  Get API key</p>
 <br>
 <div id="key-input-wrap">
-  <span class="dim">Paste key:</span>
+  <span class="dim">Paste key (optional):</span>
   <input id="api-key-input" type="password" placeholder="AIza..." autocomplete="off" spellcheck="false" />
   <span id="key-status"></span>
 </div>
 <br>
-<p class="dim">Free tier: 20 requests per day.</p>`,
+<p class="dim">Without a key: 20 fabrications per hour. With your own key: unlimited.</p>`,
   },
 ];
 
