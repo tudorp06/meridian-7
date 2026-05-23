@@ -6,7 +6,6 @@
 
 ---
 
-## 🎮 **The Pitch (30 seconds)**
 
 **Trapped on a derelict space station.** The defense AI went rogue. You're unarmed.
 
@@ -42,7 +41,7 @@ Instead, you have **Google Gemini AI** as your fabrication system. Type ***anyth
 - Want a **200HP healing potion**? You get exactly 200 HP restored.
 - Want **dragon fire**? The AI might give you a flamethrower ally or interpret it creatively.
 - Want **pizza**? The AI decides if it's food (consumable) or gets creative!
-- Want a **1000HP boss ally**? You can fabricate insanely powerful units with massive health pools to fight for you!
+- Want a **1000HP boss ally**? You can fabricate insanely powerful units with massive health pools to fight for you, and also fight **YOU**!
 
 The AI respects **numbers, adjectives, and creative requests** — it's designed to handle unconventional inputs gracefully.
 
@@ -50,9 +49,9 @@ The AI respects **numbers, adjectives, and creative requests** — it's designed
 
 ---
 
-## 🎯 **For Hackathon Judges: Test the AI System**
+## 🎯  AI system testing**
 
-**The AI can generate literally anything.** Here are examples that demonstrate different aspects:
+**The AI can generate literally anything (with some constraints, of course), in the context of the game.** Here are examples that demonstrate different aspects:
 
 ### **Intelligence Testing:**
 - `200HP mega potion` → AI gives exactly 200 HP
@@ -186,7 +185,6 @@ This game uses **Google Gemini AI (Gemini 2.0 Flash)** for procedural content ge
 - **Privacy**: No personal data is collected or stored
 - **Cost**: ~$0.0001 per fabrication (~0.01 cents). Free tier covers hundreds of items.
 
-**The AI is the core mechanic** — without it, this game wouldn't exist. It's not a gimmick; it's the entire innovation.
 
 ---
 
@@ -235,48 +233,6 @@ Open **http://localhost:3000**
 
 ---
 
-## 🏆 Why This Deserves Recognition
-
-### **1. AI as Core Gameplay (Not a Gimmick)**
-Most games use AI for NPCs or dialogue. **We use it as the entire progression system.**
-- No hardcoded weapons
-- No predefined item stats
-- The AI interprets requests and balances items on the fly
-- **True emergent gameplay**
-
-### **2. Intelligent Prompt Engineering**
-Our prompt makes the AI:
-- Respect numbers (`200HP potion` = exactly 200 HP)
-- Respect adjectives (`weak pistol` vs `legendary minigun`)
-- Handle creative requests (`cat` = pet, `dragon fire` = weapon or ally)
-- Categorize intelligently (9 item types: weapon, armor, ally, pet, vehicle, consumable, tool, trap, hazard)
-- Generate balanced stats automatically
-
-### **3. Handles Edge Cases Gracefully**
-- Absurd requests → spawns as hazard (hostile)
-- Animals → spawns as pets or allies
-- Vehicles → speed boosts
-- Tools → utility items
-- **Try to break it** — the AI adapts
-
-### **4. Production-Quality Polish**
-- Sound effects (Web Audio API)
-- Particle systems
-- 5-level progression with unique themes
-- Organic map generation
-- Real-time combat
-- Full UI/UX design
-
-### **5. Replayability Through AI**
-No two runs are identical because:
-- You can fabricate different items each time
-- The AI generates unique descriptions and stats
-- Creative combinations are encouraged
-
-**This isn't "AI-assisted development" — this is AI as the game.**
-
----
-
 ## 🐛 Known Quirks
 
 - AI might interpret requests differently than expected — that's part of the fun!
@@ -284,6 +240,9 @@ No two runs are identical because:
 - Very long item names may truncate in inventory
 - Free Gemini tier: 20 fabrications per day (or use your own key for more)
 
+*Try fabricating: dragon, time machine, rubber duck, antimatter, disco ball, or literally anything else.*
+
+**Made for the A3 web design hackathon - game category** 🚀
 ---
 
 ## 📝 License
@@ -292,6 +251,4 @@ MIT — feel free to fork, hack, remix!
 
 ---
 
-**Made for the hackathon web game category** 🚀
 
-*Try fabricating: dragon, time machine, rubber duck, antimatter, disco ball, or literally anything else.*
