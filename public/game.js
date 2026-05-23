@@ -77,9 +77,11 @@ const heldKeys = new Set();
 let mouseX = -1, mouseY = -1; // canvas-pixel coords (-1 = off-canvas)
 let lastPlayerStep = 0;
 let lastEnemyStep  = 0;
+let lastAllyStep   = 0;
 let lastWeaponUse  = 0;
 const PLAYER_MS  = 130;  // ms between steps while holding a direction
 const ENEMY_MS   = 360;  // ms between enemy AI ticks (independent of player)
+const ALLY_MS    = 150;  // ms between ally/pet ticks (almost as fast as player)
 const WEAPON_MS  = 280;  // ms between weapon uses when holding SPACE
 // gt = gameTime frame counter, used for sprite animations
 
@@ -103,7 +105,7 @@ function initGame(resetLevel = true) {
   }
 
   map = []; rooms = []; entities = []; particles = []; dmgNums = []; projectileTrails = []; messages = [];
-  heldKeys.clear(); lastPlayerStep = 0; lastEnemyStep = 0; lastWeaponUse = 0;
+  heldKeys.clear(); lastPlayerStep = 0; lastEnemyStep = 0; lastAllyStep = 0; lastWeaponUse = 0;
   turn = 0; state = 'playing'; gt = 0;
 
   generateMap();
@@ -672,41 +674,6 @@ function runEnemyTurns() {
       }
       e.wanderTimer--;
       tryMove(e, e.wanderDir.dx, e.wanderDir.dy);
-    }
-  });
-
-  entities.filter(e=>e.type==='ally').forEach(ally => {
-    const GUARD_RANGE = 7; // tiles — ally only engages enemies within this radius of the PLAYER
-    const threat = entities
-      .filter(e => (e.type==='enemy'||e.type==='hazard') && mdist(player, e) <= GUARD_RANGE)
-      .sort((a,b) => mdist(ally,a) - mdist(ally,b))[0];
-
-    if (threat) {
-      // Intercept the threat
-      const dx=threat.x-ally.x, dy=threat.y-ally.y;
-      if (Math.abs(dx)>Math.abs(dy)) { if(!tryMove(ally,Math.sign(dx),0)) tryMove(ally,0,Math.sign(dy)); }
-      else                           { if(!tryMove(ally,0,Math.sign(dy))) tryMove(ally,Math.sign(dx),0); }
-    } else {
-      // No nearby threats — stay close to player (1-2 tile gap)
-      const dx=player.x-ally.x, dy=player.y-ally.y;
-      if (Math.abs(dx)+Math.abs(dy) > 2) {
-        if (Math.abs(dx)>Math.abs(dy)) { if(!tryMove(ally,Math.sign(dx),0)) tryMove(ally,0,Math.sign(dy)); }
-        else                           { if(!tryMove(ally,0,Math.sign(dy))) tryMove(ally,Math.sign(dx),0); }
-      }
-    }
-  });
-
-  // Pets — follow player closely, no combat
-  entities.filter(e=>e.type==='pet').forEach(pet => {
-    const dx=player.x-pet.x, dy=player.y-pet.y;
-    const dist = Math.abs(dx)+Math.abs(dy);
-    const followDist = pet.followDist || 2;
-    if (dist > followDist) {
-      if (Math.abs(dx)>Math.abs(dy)) { if(!tryMove(pet,Math.sign(dx),0)) tryMove(pet,0,Math.sign(dy)); }
-      else                           { if(!tryMove(pet,0,Math.sign(dy))) tryMove(pet,Math.sign(dx),0); }
-    } else if (dist < followDist - 1 && Math.random() < 0.3) {
-      // sometimes step away if too close
-      tryMove(pet, ri(-1,1), ri(-1,1));
     }
   });
 
@@ -2664,11 +2631,48 @@ function processInput(ts) {
 }
 
 // Enemies tick on their own timer — totally independent of player input
+function runAllyTurns() {
+  entities.filter(e=>e.type==='ally').forEach(ally => {
+    const GUARD_RANGE = 7;
+    const threat = entities
+      .filter(e => (e.type==='enemy'||e.type==='hazard') && mdist(player, e) <= GUARD_RANGE)
+      .sort((a,b) => mdist(ally,a) - mdist(ally,b))[0];
+
+    if (threat) {
+      const dx=threat.x-ally.x, dy=threat.y-ally.y;
+      if (Math.abs(dx)>Math.abs(dy)) { if(!tryMove(ally,Math.sign(dx),0)) tryMove(ally,0,Math.sign(dy)); }
+      else                           { if(!tryMove(ally,0,Math.sign(dy))) tryMove(ally,Math.sign(dx),0); }
+    } else {
+      const dx=player.x-ally.x, dy=player.y-ally.y;
+      if (Math.abs(dx)+Math.abs(dy) > 2) {
+        if (Math.abs(dx)>Math.abs(dy)) { if(!tryMove(ally,Math.sign(dx),0)) tryMove(ally,0,Math.sign(dy)); }
+        else                           { if(!tryMove(ally,0,Math.sign(dy))) tryMove(ally,Math.sign(dx),0); }
+      }
+    }
+  });
+
+  entities.filter(e=>e.type==='pet').forEach(pet => {
+    const dx=player.x-pet.x, dy=player.y-pet.y;
+    const dist = Math.abs(dx)+Math.abs(dy);
+    const followDist = pet.followDist || 2;
+    if (dist > followDist) {
+      if (Math.abs(dx)>Math.abs(dy)) { if(!tryMove(pet,Math.sign(dx),0)) tryMove(pet,0,Math.sign(dy)); }
+      else                           { if(!tryMove(pet,0,Math.sign(dy))) tryMove(pet,Math.sign(dx),0); }
+    } else if (dist < followDist - 1 && Math.random() < 0.3) {
+      tryMove(pet, ri(-1,1), ri(-1,1));
+    }
+  });
+}
+
 function processEnemies(ts) {
-  if (state !== 'playing') return; // don't tick enemies when paused/dead/won
+  if (state !== 'playing') return;
   if (ts - lastEnemyStep > ENEMY_MS) {
     runEnemyTurns();
     lastEnemyStep = ts;
+  }
+  if (ts - lastAllyStep > ALLY_MS) {
+    runAllyTurns();
+    lastAllyStep = ts;
   }
 }
 
