@@ -966,7 +966,7 @@ function closeFab() {
 }
 
 fabInput.addEventListener('keydown', async e => {
-  if (e.key==='Escape') { closeFab(); return; }
+  if (e.key==='Escape') { e.preventDefault(); closeFab(); return; }
   if (e.key!=='Enter') return;
   const desc = fabInput.value.trim();
   if (!desc) return;
@@ -3009,18 +3009,17 @@ function getIconKey(e) {
     if (n.match(/bat|club|mace|hammer/))  return 'weapon_spikedbat';
 
     // Ranged weapons
-    if (n.match(/minigun/))               return 'weapon_minigun';
+    if (n.match(/minigun|gatling|vulcan/)) return 'weapon_minigun';
     if (n.match(/revolver/))              return 'weapon_revolver';
     if (n.match(/tec-?9|tec9|machine pistol/)) return 'weapon_tec9';
     if (n.match(/crossbow|bow/))          return 'weapon_crossbow';
-    if (n.match(/bazooka|rocket|launcher|grenade|rpg/)) return 'weapon_bazooka';
-    if (n.match(/flame|fire|torch|incinerator/)) return 'weapon_flamethrower';
-    if (n.match(/laser|plasma|beam|ray|photon/)) return 'weapon_laser';
-    if (n.match(/rifle|automatic|smg|uzi/)) return 'weapon_minigun';
-    if (n.match(/pistol|gun|glock|beretta|magnum|colt|handgun|sidearm|shotgun|cannon/)) return 'weapon_gun';
+    if (n.match(/bazooka|rocket|launcher|grenade|rpg|missile/)) return 'weapon_bazooka';
+    if (n.match(/flame|fire|torch|incinerator|flamethrower/)) return 'weapon_flamethrower';
+    if (n.match(/laser|plasma|beam|ray|photon|blaster|cannon|rifle/)) return 'weapon_laser';
+    if (n.match(/automatic|smg|uzi/)) return 'weapon_minigun';
+    if (n.match(/pistol|gun|glock|beretta|magnum|colt|handgun|sidearm|shotgun/)) return 'weapon_gun';
 
-    // No match → use emoji if available, fallback to gun
-    if (e.emoji && e.emoji !== '?' && e.emoji !== '❓') return null;
+    // Fallback to gun icon for all other weapons (don't use emoji for fabricated guns)
     return 'weapon_gun';
   }
   return null;
