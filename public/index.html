@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meridian-7</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+
+    <!-- ── Intro cards ────────────────────────────────────────── -->
+    <div id="intro-screen">
+      <div id="intro-card">
+        <div id="intro-card-tag">Card 1 of 3</div>
+        <div id="intro-card-title">—</div>
+        <div id="intro-card-divider"></div>
+        <div id="intro-card-body"></div>
+      </div>
+      <div id="intro-footer">
+        <div id="intro-progress"></div>
+        <div id="intro-next">SPACE to continue →</div>
+      </div>
+    </div>
+
+    <!-- ── FABRICATE overlay ──────────────────────────────────── -->
+    <div id="fab-overlay" class="hidden">
+      <div id="fab-panel">
+        <div id="fab-title">FABRICATION TERMINAL</div>
+        <div id="fab-sub">Describe what to fabricate:</div>
+        <div id="fab-input-row">
+          <span id="fab-caret">&gt;</span>
+          <input id="fab-input" type="text" maxlength="120"
+                 autocomplete="off" spellcheck="false" />
+        </div>
+        <div id="fab-status"></div>
+        <div id="fab-result" class="hidden">
+          <div id="fab-res-name"></div>
+          <div id="fab-res-desc"></div>
+          <div id="fab-res-stats"></div>
+        </div>
+        <div id="fab-hint">ENTER to fabricate &nbsp;&nbsp; ESC to close</div>
+      </div>
+    </div>
+
+    <!-- ── Inventory screen ──────────────────────────────────── -->
+    <div id="inv-screen" class="hidden">
+      <div id="inv-panel">
+        <div id="inv-header">
+          <span id="inv-title">INVENTORY</span>
+          <span id="inv-close">ESC or I to close</span>
+        </div>
+        <div id="inv-list"></div>
+      </div>
+    </div>
+
+    <!-- ── Pause screen ───────────────────────────────────────── -->
+    <div id="pause-screen" class="hidden">
+      <div id="pause-panel">
+        <div id="pause-title">PAUSED</div>
+        <div id="pause-divider"></div>
+        <div id="pause-menu">
+          <div class="pause-item" onclick="closePause()">Resume (ESC)</div>
+          <div class="pause-item" onclick="initGame(); closePause();">Restart Run</div>
+          <div class="pause-item" onclick="SFX.enabled = !SFX.enabled; this.textContent = SFX.enabled ? '🔊 Sound ON' : '🔇 Sound OFF';">🔊 Sound ON</div>
+        </div>
+        <div id="pause-controls">
+          <div class="pause-control-row"><span class="key">WASD</span> Move</div>
+          <div class="pause-control-row"><span class="key">F</span> Fabricate</div>
+          <div class="pause-control-row"><span class="key">SPACE</span> Use Weapon</div>
+          <div class="pause-control-row"><span class="key">I</span> Inventory</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Fullscreen button ─────────────────────────────────── -->
+    <button id="btn-fullscreen" title="Toggle fullscreen (F11)">⛶ FULLSCREEN</button>
+
+    <!-- ── Win screen ────────────────────────────────────────── -->
+    <div id="win-screen" class="hidden">
+      <div id="win-title">SIGNAL RESTORED</div>
+      <div id="win-sub">You escaped Meridian-7. Against all odds.</div>
+      <div id="win-restart">Press R to play again</div>
+    </div>
+
+    <!-- ── Level transition ───────────────────────────────────── -->
+    <div id="level-transition" class="hidden">
+      <div id="level-number">LEVEL 2</div>
+      <div id="level-subtitle">SECTOR CLEARED — ADVANCING</div>
+    </div>
+
+    <!-- ── Dead screen ────────────────────────────────────────── -->
+    <div id="dead-screen" class="hidden">
+      <div id="dead-title">SIGNAL LOST</div>
+      <div id="dead-sub">All life signs offline.</div>
+      <div id="dead-restart">Press R to restart</div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

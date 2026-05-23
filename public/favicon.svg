@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background -->
+  <rect width="64" height="64" rx="10" fill="#06090f"/>
+
+  <!-- Outer frame / station ring -->
+  <rect x="6" y="6" width="52" height="52" rx="6"
+        fill="none" stroke="#1e3048" stroke-width="1.5"/>
+
+  <!-- Corner circuit nodes -->
+  <circle cx="6"  cy="6"  r="2.5" fill="#1e3048"/>
+  <circle cx="58" cy="6"  r="2.5" fill="#1e3048"/>
+  <circle cx="6"  cy="58" r="2.5" fill="#1e3048"/>
+  <circle cx="58" cy="58" r="2.5" fill="#1e3048"/>
+
+  <!-- Circuit lines from corners -->
+  <line x1="6"  y1="6"  x2="18" y2="6"  stroke="#1e3048" stroke-width="1"/>
+  <line x1="6"  y1="6"  x2="6"  y2="18" stroke="#1e3048" stroke-width="1"/>
+  <line x1="58" y1="6"  x2="46" y2="6"  stroke="#1e3048" stroke-width="1"/>
+  <line x1="58" y1="6"  x2="58" y2="18" stroke="#1e3048" stroke-width="1"/>
+  <line x1="6"  y1="58" x2="18" y2="58" stroke="#1e3048" stroke-width="1"/>
+  <line x1="6"  y1="58" x2="6"  y2="46" stroke="#1e3048" stroke-width="1"/>
+  <line x1="58" y1="58" x2="46" y2="58" stroke="#1e3048" stroke-width="1"/>
+  <line x1="58" y1="58" x2="58" y2="46" stroke="#1e3048" stroke-width="1"/>
+
+  <!-- Diamond — player character shape, glowing -->
+  <polygon points="32,10 50,32 32,54 14,32"
+           fill="#0d2030" stroke="#4dd9e8" stroke-width="1.5"/>
+
+  <!-- Inner diamond core -->
+  <polygon points="32,20 42,32 32,44 22,32"
+           fill="#4dd9e8" opacity="0.9"/>
+
+  <!-- Bright centre -->
+  <polygon points="32,26 37,32 32,38 27,32"
+           fill="#ffffff"/>
+
+  <!-- Glow hint (soft circle behind diamond) -->
+  <circle cx="32" cy="32" r="14" fill="none"
+          stroke="#4dd9e8" stroke-width="0.5" opacity="0.3"/>
+</svg>
