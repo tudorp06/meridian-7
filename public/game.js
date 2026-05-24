@@ -23,6 +23,33 @@ const SFX = {
   victory() {},
 }
 
+// ── Background Music ─────────────────────────────────────────────────────────
+const MUSIC = {
+  menu: new Audio('/music/slow-travel.wav'),
+  game: new Audio('/music/in-the-wreckage.wav'),
+  current: null,
+  play(track) {
+    if (this.current === track) return;
+    this.stopAll();
+    this.current = track;
+    track.loop = true;
+    track.volume = 0.35;
+    track.play().catch(() => {});
+  },
+  stopAll() {
+    [this.menu, this.game].forEach(t => { t.pause(); t.currentTime = 0; });
+    this.current = null;
+  },
+  fadeOut(track, duration = 1000) {
+    const step = 0.05;
+    const interval = duration * step / track.volume;
+    const fade = setInterval(() => {
+      track.volume = Math.max(0, track.volume - step);
+      if (track.volume <= 0) { clearInterval(fade); track.pause(); track.currentTime = 0; }
+    }, interval);
+  }
+};
+
 const T = { WALL: 0, FLOOR: 1 };
 
 const BASE_COLORS = {
@@ -384,6 +411,7 @@ function tryMove(ent, dx, dy) {
     if (currentLevel >= 5) {
       // Final level completed - show staged victory cinematic
       state = 'won';
+      MUSIC.stopAll();
       winScreen.classList.remove('hidden');
       log('>>> YOU ESCAPED MERIDIAN-7 <<<');
       SFX.fabricate();
@@ -434,6 +462,7 @@ function attack(attacker, defender) {
   if (defender.hp <= 0) {
     if (defender.type==='player') {
       state='dead';
+      MUSIC.stopAll();
       deadScreen.classList.remove('hidden');
       log('>>> SIGNAL LOST <<<');
       SFX.death();
@@ -2430,7 +2459,7 @@ document.addEventListener('keydown', e => {
   if (['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
 
   if (state==='paused') { if (e.code==='Escape') closePause(); return; }
-  if (state==='dead' || state==='won')  { if (e.code==='KeyR') initGame(); return; }
+  if (state==='dead' || state==='won')  { if (e.code==='KeyR') { MUSIC.play(MUSIC.game); initGame(); } return; }
   if (state==='inventory') { if (e.code==='KeyI'||e.code==='Escape') closeInventory(); return; }
   if (state==='playing' && e.code==='Escape') { openPause(); return; }
   if (e.code==='KeyI') { e.preventDefault(); openInventory(); return; }
@@ -2863,6 +2892,7 @@ function advanceIntro() {
     renderCard(cardIndex);
   } else {
     introScreen.classList.add('hidden');
+    MUSIC.play(MUSIC.game);
     initGame();
     requestAnimationFrame(loop);
   }
@@ -2920,7 +2950,8 @@ function getIconKey(e) {
     if (n.match(/katana/))                return 'weapon_katana';
     if (n.match(/sword|blade|saber|sabre|lightsaber|claymore|scimitar|rapier|cutlass/)) return 'weapon_sword';
     if (n.match(/knife|dagger|axe|hatchet/)) return 'weapon_sword';
-    if (n.match(/bat|club|mace|hammer/))  return 'weapon_spikedbat';
+    if (n.match(/staff|wand|rod|scepter|spear|trident|halberd|pike|polearm|bo\b/)) return 'weapon_spikedbat';
+    if (n.match(/bat|club|mace|hammer|flail|whip/))  return 'weapon_spikedbat';
 
     // Ranged weapons
     if (n.match(/minigun|gatling|vulcan/)) return 'weapon_minigun';
@@ -2940,6 +2971,12 @@ function getIconKey(e) {
 }
 
 renderCard(0);
+
+// Start menu music — needs user interaction first, so also try on first keypress
+document.addEventListener('keydown', function startMenuMusic() {
+  MUSIC.play(MUSIC.menu);
+  document.removeEventListener('keydown', startMenuMusic);
+}, { once: true });
 
 document.addEventListener('keydown', e => {
   if (!introScreen.classList.contains('hidden')) {

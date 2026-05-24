@@ -24,7 +24,7 @@ if (API_KEY) {
 
 // ── Rate limiter — protect the shared API key ─────────────────────────────────
 const rateLimits = new Map(); // IP → { count, resetTime }
-const RATE_LIMIT  = 20;       // max fabrications per window
+const RATE_LIMIT  = 50;       // max fabrications per window
 const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 
 function checkRateLimit(ip) {
