@@ -75,15 +75,17 @@ The AI respects numbers and adjectives — `200HP potion` gives ~200 HP, `weak p
 
 ---
 
-## For A3 Judges
+## ⚠️ For A3 Judges
 
-The AI fabrication system is live and ready to use — no setup needed. The API key is pre-configured on the server.
+The AI fabrication system is **live and ready to use** — no setup required. The Gemini API key is pre-configured on the backend server.
 
-**Please keep usage reasonable — the API credits are on my account (I have enough balance deposited for credits, but there's still a limit), so I'd kindly ask you to stay under ~50 fabrication requests during your review.** That should be more than enough to experience the full game (most runs use 5-10 fabrications).
+**To confirm the API works:** Open the fabrication terminal (press **F** in-game), type anything (e.g. `laser sword`), and press Enter. You should see an AI-generated item appear within 2-5 seconds. If the backend is cold-starting, the first request may take up to 30 seconds.
 
-If fabrication ever fails or returns an error, it likely means the API rate limit was temporarily hit. Just wait a minute and try again.
+**Please keep usage under ~50 fabrication requests during your review.** The API credits are on my personal account. Most playthroughs use 5-10 fabrications, so 50 is more than enough to fully experience the game.
 
-Thank you for playing!
+If fabrication returns an error, wait a minute and try again — it likely means a temporary rate limit was hit.
+
+Thank you for playing! 🚀
 
 ---
 
