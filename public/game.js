@@ -25,30 +25,32 @@ const SFX = {
 
 // ── Background Music ─────────────────────────────────────────────────────────
 const MUSIC = {
-  menu: new Audio('/music/slow-travel.wav'),
-  game: new Audio('/music/in-the-wreckage.wav'),
-  current: null,
-  play(track) {
-    if (this.current === track) return;
-    this.stopAll();
-    this.current = track;
-    track.loop = true;
-    track.volume = 0.35;
-    track.play().catch(() => {});
+  track: new Audio('/music/slow-travel.wav'),
+  enabled: true,
+  init() {
+    this.track.loop = true;
+    this.track.volume = 0.3;
   },
-  stopAll() {
-    [this.menu, this.game].forEach(t => { t.pause(); t.currentTime = 0; });
-    this.current = null;
+  play() {
+    if (!this.enabled) return;
+    this.track.play().catch(() => {});
   },
-  fadeOut(track, duration = 1000) {
-    const step = 0.05;
-    const interval = duration * step / track.volume;
-    const fade = setInterval(() => {
-      track.volume = Math.max(0, track.volume - step);
-      if (track.volume <= 0) { clearInterval(fade); track.pause(); track.currentTime = 0; }
-    }, interval);
+  toggle() {
+    this.enabled = !this.enabled;
+    if (this.enabled) {
+      this.track.play().catch(() => {});
+    } else {
+      this.track.pause();
+    }
+    return this.enabled;
   }
 };
+MUSIC.init();
+
+function toggleSound() {
+  const on = MUSIC.toggle();
+  document.getElementById('btn-sound').textContent = on ? '🔊 Music ON' : '🔇 Music OFF';
+}
 
 const T = { WALL: 0, FLOOR: 1 };
 
@@ -411,7 +413,7 @@ function tryMove(ent, dx, dy) {
     if (currentLevel >= 5) {
       // Final level completed - show staged victory cinematic
       state = 'won';
-      MUSIC.stopAll();
+      MUSIC.track.pause();
       winScreen.classList.remove('hidden');
       log('>>> YOU ESCAPED MERIDIAN-7 <<<');
       SFX.fabricate();
@@ -462,7 +464,7 @@ function attack(attacker, defender) {
   if (defender.hp <= 0) {
     if (defender.type==='player') {
       state='dead';
-      MUSIC.stopAll();
+      MUSIC.track.pause();
       deadScreen.classList.remove('hidden');
       log('>>> SIGNAL LOST <<<');
       SFX.death();
@@ -2459,7 +2461,7 @@ document.addEventListener('keydown', e => {
   if (['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
 
   if (state==='paused') { if (e.code==='Escape') closePause(); return; }
-  if (state==='dead' || state==='won')  { if (e.code==='KeyR') { MUSIC.play(MUSIC.game); initGame(); } return; }
+  if (state==='dead' || state==='won')  { if (e.code==='KeyR') { MUSIC.play(); initGame(); } return; }
   if (state==='inventory') { if (e.code==='KeyI'||e.code==='Escape') closeInventory(); return; }
   if (state==='playing' && e.code==='Escape') { openPause(); return; }
   if (e.code==='KeyI') { e.preventDefault(); openInventory(); return; }
@@ -2892,7 +2894,7 @@ function advanceIntro() {
     renderCard(cardIndex);
   } else {
     introScreen.classList.add('hidden');
-    MUSIC.play(MUSIC.game);
+    MUSIC.play();
     initGame();
     requestAnimationFrame(loop);
   }
@@ -2974,7 +2976,7 @@ renderCard(0);
 
 // Start menu music — needs user interaction first, so also try on first keypress
 document.addEventListener('keydown', function startMenuMusic() {
-  MUSIC.play(MUSIC.menu);
+  MUSIC.play();
   document.removeEventListener('keydown', startMenuMusic);
 }, { once: true });
 

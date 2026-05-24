@@ -64,7 +64,7 @@
         <div id="pause-menu">
           <div class="pause-item" onclick="closePause()">Resume (ESC)</div>
           <div class="pause-item" onclick="initGame(); closePause();">Restart Run</div>
-          <div class="pause-item" onclick="SFX.enabled = !SFX.enabled; this.textContent = SFX.enabled ? '🔊 Sound ON' : '🔇 Sound OFF';">🔊 Sound ON</div>
+          <div class="pause-item" id="btn-sound" onclick="toggleSound()">🔊 Music ON</div>
         </div>
         <div id="pause-controls">
           <div class="pause-control-row"><span class="key">WASD</span> Move</div>
