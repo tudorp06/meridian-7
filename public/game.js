@@ -2862,7 +2862,7 @@ const CARDS = [
     tag:   'Setup',
     html: `<p>The fabrication terminal is powered by AI. Type anything you can imagine and the station will build it for you.</p>
 <br>
-<p class="dim">You get <span class="highlight">20 fabrications per hour</span> — choose wisely.</p>
+<p class="dim">You have <span class="highlight">50 requests per hour</span> — choose wisely.</p>
 <br>
 <p class="accent">Good luck, survivor.</p>`,
   },

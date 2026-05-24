@@ -90,7 +90,7 @@ app.post('/fabricate', async (req, res) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
     const { allowed, remaining } = checkRateLimit(ip);
     if (!allowed) {
-      return res.status(429).json({ error: `Rate limit reached (${RATE_LIMIT}/hour). Enter your own free API key to get unlimited fabrications!` });
+      return res.status(429).json({ error: `Rate limit reached (${RATE_LIMIT}/hour). Please wait and try again later.` });
     }
     console.log(`[RATE] ${ip}: ${remaining} fabrications remaining this hour`);
   }
