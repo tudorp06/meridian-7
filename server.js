@@ -87,7 +87,7 @@ app.post('/fabricate', async (req, res) => {
   // Rate limit when using the shared server key (not player's own key)
   const usingSharedKey = !apiKey || !apiKey.startsWith('AIza');
   if (usingSharedKey) {
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
     const { allowed, remaining } = checkRateLimit(ip);
     if (!allowed) {
       return res.status(429).json({ error: `Rate limit reached (${RATE_LIMIT}/hour). Please wait and try again later.` });
